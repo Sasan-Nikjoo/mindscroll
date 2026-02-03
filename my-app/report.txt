@@ -1,0 +1,70 @@
+Development Log: Mindscroll
+
+Date: February 4, 2026 Developer: Sasan Nikjoo Tech Stack: Next.js (App Router), SQLite, Tailwind CSS
+
+
+🚀 Accomplishments
+Started the "Mindscroll" project from scratch. Transitioned from a default template to a functional Full-Stack application with custom Authentication and Database management.
+1. Architecture & Database
+
+    Engine: Chose SQLite for a lightweight, portable, local database.
+
+    Connection: Implemented a direct connection using the sqlite3 library (bypassing ORMs like Prisma for direct control).
+
+    Schema Management: Created tables manually using DB Browser for SQLite.
+
+    Database Schema:
+
+        users: Stores id, username, email, and securely hashed password.
+
+        posts: Stores id, title, content, created_at, and authorId (Foreign Key).
+
+
+2. Authentication System (Custom Build)
+
+    Sign Up:
+
+        Built a Server Action to handle form submissions.
+
+        Implemented bcryptjs to hash passwords (security best practice) before storing in SQLite.
+
+    Login:
+
+        Implemented logic to look up users by email.
+
+        Added password verification using bcrypt.compare.
+
+    Session Management:
+
+        Integrated iron-session to manage secure, encrypted cookies.
+
+        Users stay logged in across page reloads.
+
+    Logout:
+
+        Added functionality to destroy the session cookie and redirect to the home page.
+
+
+3. Core Features (The Blog)
+
+    Write Post:
+
+        Created a protected route (/new-post) accessible only to logged-in users.
+
+        Implemented database insertion linking the new post to the logged-in user's ID.
+
+    Read Feed:
+
+        Updated the Home Page to fetch all posts from SQLite.
+
+        Implemented a JOIN query to display the Author's username alongside their post title and content.
+
+4. UI/UX
+
+    Cleaned up the default Next.js boilerplate.
+
+    Implemented conditional rendering in the Header:
+
+        Guest: Shows "Login / Sign Up".
+
+        User: Shows "Hi, [Username]", "Write Post" button, and "Logout" button.
