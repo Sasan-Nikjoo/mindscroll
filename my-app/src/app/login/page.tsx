@@ -2,25 +2,27 @@ import { getUserByEmail } from '@/lib/db';
 import { getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import bcrypt from 'bcryptjs';
+import Link from 'next/link';
+import '../auth.css'; // Import the new styles
 
 export default async function LoginPage() {
 
     async function handleLogin(formData: FormData) {
         'use server';
 
+
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
 
-        // 1. Check if user exists in SQLite
+        // 1. Check if user exists
         const user: any = await getUserByEmail(email);
 
         if (!user) {
-            // In a real app, you would show an error message on the screen
             console.log("Error: User not found");
             return;
         }
 
-        // 2. Compare the typed password with the hashed password in DB
+        // 2. Compare password
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
@@ -28,39 +30,60 @@ export default async function LoginPage() {
             return;
         }
 
-        // 3. Create the session (Log them in!)
+        // 3. Create session
         const session = await getSession();
-
-        // We store only the necessary info in the cookie
         // @ts-ignore
         session.user = { id: user.id, username: user.username };
         await session.save();
 
-        // 4. Redirect to home
+        // 4. Redirect
         redirect('/');
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-100">
-            <div className="z-10 w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-                <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Welcome Back</h1>
-
-                <form action={handleLogin} className="flex flex-col gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                        <input name="email" type="email" required className="mt-1 block w-full p-2 border rounded-md border-gray-300"/>
+        <div className="login-container">
+            <div className="login">
+                <div className="login__content">
+                    {/* Image Section */}
+                    <div className="login__img">
+                        <img src="https://raw.githubusercontent.com/bedimcode/responsive-login-signin-signup/b3c2eaa19d76624092bd606d28fbd616d539de92/assets/img/img-login.svg" alt="Login Illustration"/>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Password</label>
-                        <input name="password" type="password" required className="mt-1 block w-full p-2 border rounded-md border-gray-300"/>
-                    </div>
+                    {/* Form Section */}
+                    <div className="login__forms">
+                        <form action={handleLogin} className="login__registre block">
 
-                    <button type="submit" className="mt-4 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
-                        Sign In
-                    </button>
-                </form>
+                            <h1 className="login__title">Sign In</h1>
+
+                            <Link href="/" className="return">
+                                return
+                            </Link>
+
+                            <div className="login__box">
+                                <i className='bx bx-user login__icon'></i>
+                                <input name="email" type="email" placeholder="Email" required className="login__input"/>
+                            </div>
+
+                            <div className="login__box">
+                                <i className='bx bx-lock-alt login__icon'></i>
+                                <input name="password" type="password" placeholder="Password" required className="login__input"/>
+                            </div>
+
+                            <a href="#" className="login__forgot">Forgot password?</a>
+
+                            <button type="submit" className="login__button">Sign In</button>
+
+                            <div>
+                                <span className="login__account">Don't have an Account?</span>
+                                {/* This links to the Signup Page */}
+                                <Link href="/signup" className="login__signin">
+                                    Sign Up
+                                </Link>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </main>
+        </div>
     );
 }
